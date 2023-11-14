@@ -16,7 +16,7 @@ vehicle.armed = True
 
 while not vehicle.armed:
     print("Ждем моторы...")
-    time.sleep(1)
+    time.sleep(1) 
 
 def circle(duration):
     vehicle.channels.overrides['1'] = 1200
@@ -24,6 +24,8 @@ def circle(duration):
     vehicle.channels.overrides['1'] = 1500
 
 def move_right(duration):
+    a = int(1400 + angle * 5)
+    b = int(1700 + angle * 5)
     vehicle.channels.overrides['3'] = a
     vehicle.channels.overrides['1'] = b
     time.sleep(duration)
@@ -36,6 +38,8 @@ def move_forward(duration):
     vehicle.channels.overrides['3'] = 1400
 
 def move_left(duration):
+    a = int(1400 + angle * 5)
+    c = int(1350 - angle * 5)
     vehicle.channels.overrides['3'] = a
     vehicle.channels.overrides['1'] = c
     time.sleep(duration)
@@ -67,7 +71,7 @@ while True:
 
         for line in lines:
             rho, theta = line[0]
-            angle = math.degrees(theta)
+            angle = int(math.degrees(theta))
 
             if angle > 120:
                 angle = angle - 90
@@ -76,10 +80,6 @@ while True:
             else:
                 angle2 = angle
                 print(f"Отклонение от траектории на {angle} градусов")
-                
-                a = int(1400 + angle * 5)
-                b = int(1700 + angle * 5)
-                c = int(1350 - angle * 5)
 
                 if angle2 > 10:
                     GPIO.output(12, GPIO.LOW)
