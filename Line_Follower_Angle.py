@@ -42,11 +42,7 @@ def move_left(duration):
     vehicle.channels.overrides['3'] = 1400
     vehicle.channels.overrides['1'] = 1500
 
-camera = picamera.PiCamera()
-camera.resolution = (192, 108)
-camera.framerate = 20
-camera.zoom = (0.1, 0.1, 0.6, 0.1)
-rawCapture = PiRGBArray(camera, size=(192, 108))
+cap = cv2.VideoCapture(0)
 
 GPIO.setmode(GPIO.BCM)
 GPIO.setwarnings(False)
@@ -56,15 +52,18 @@ GPIO.setup(16, GPIO.OUT)
 GPIO.setup(20, GPIO.OUT)
 GPIO.setup(21, GPIO.OUT)
 
-for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True):
-    image = frame.array
-    cv2.imshow('img', image)
-    key = cv2.waitKey(1) & 0xFF
+while True:
+    ret, image = cap.read()
+    image = cv2.resize(image, (640, 480))
+    height, width = image.shape[:2]
+    top_cutoff = int(height * 0.25)
+    bottom_cutoff = int(height * 0.75)
+    image = image[top_cutoff:bottom_cutoff, :]
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     edges = cv2.Canny(gray, 50, 150, apertureSize=3)
     lines = cv2.HoughLines(edges, 1, math.pi / 180, 200)
 
-    if lines.any():
+    if lines is not None:
 
         for line in lines:
             rho, theta = line[0]
@@ -73,36 +72,39 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
             if angle > 120:
                 angle = angle - 90
                 angle2 = -angle
-                print("Угол между линией и центром:", -angle)
+                print(f"Отклонение от траектории на {-angle} градусов")
             else:
                 angle2 = angle
-                print("Угол между линией и центром:", angle)
+                print(f"Отклонение от траектории на {angle} градусов")
+                
+                a = int(1400 + angle * 5)
+                b = int(1700 + angle * 5)
+                c = int(1350 - angle * 5)
 
-                a = 1400 + angle * 2
-                b = 1700 + angle * 2
-                c = 1350 - angle * 2
-
-                if angle2 > -2:
+                if angle2 > 10:
                     GPIO.output(12, GPIO.LOW)
                     GPIO.output(21, GPIO.HIGH)
                     print("Поворот вправо")
                     move_right(0.5)
 
-                if angle2 < 2 and angle2 > -2:
+                elif angle2 < 10 and angle2 > -10:
                     GPIO.output(12, GPIO.HIGH)
                     GPIO.output(21, GPIO.HIGH)
                     print("Движение прямо")
                     move_forward(0.5)
 
-                if angle2 < 2:
+                elif angle2 < -10:
                     GPIO.output(12, GPIO.HIGH)
                     GPIO.output(21, GPIO.LOW)
                     print("Поворот влево")
                     move_left(0.5)
+                
+                else:
+                    print("Линия не найдена")
 
-    if key == ord("q"):
-            break
-            rawCapture.truncate(0)
+    cv2.imshow("img", image)
+    if cv2.waitKey(1) >= 0:
+        break
 
 GPIO.output(12, GPIO.LOW)
 GPIO.output(16, GPIO.LOW)
