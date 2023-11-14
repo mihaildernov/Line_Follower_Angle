@@ -1,12 +1,11 @@
 import sys
 sys.path.append("/usr/local/lib/python3.9/site-packages")
-from picamera.array import PiRGBArray
 import RPi.GPIO as GPIO
 import cv2
-import picamera
 from dronekit import *
 from pymavlink import mavutil
 import time
+import math
 
 master = mavutil.mavlink_connection('/dev/ttyACM0')
 vehicle = connect('/dev/ttyACM0', wait_ready=True)
