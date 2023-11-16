@@ -74,30 +74,33 @@ while True:
 
             if angle > 120:
                 angle = angle - 90
-                angle2 = -angle
                 print(f"Отклонение от траектории на {-angle} градусов")
+
+                if angle < 10 and angle >= 0:
+                    GPIO.output(12, GPIO.HIGH)
+                    GPIO.output(21, GPIO.HIGH)
+                    print("Движение прямо")
+                    move_forward(0.5)
+                else:
+                    GPIO.output(12, GPIO.HIGH)
+                    GPIO.output(21, GPIO.LOW)
+                    print("Поворот влево")
+                    move_left(0.5)
             else:
-                angle2 = angle
                 print(f"Отклонение от траектории на {angle} градусов")
 
-                if angle2 > 10:
+                if angle >= 10:
                     GPIO.output(12, GPIO.LOW)
                     GPIO.output(21, GPIO.HIGH)
                     print("Поворот вправо")
                     move_right(0.5)
 
-                elif angle2 < 10 and angle2 > -10:
+                if angle < 10 and angle >= 0:
                     GPIO.output(12, GPIO.HIGH)
                     GPIO.output(21, GPIO.HIGH)
                     print("Движение прямо")
                     move_forward(0.5)
-
-                elif angle2 < -10:
-                    GPIO.output(12, GPIO.HIGH)
-                    GPIO.output(21, GPIO.LOW)
-                    print("Поворот влево")
-                    move_left(0.5)
-                
+                    
                 else:
                     print("Линия не найдена")
 
