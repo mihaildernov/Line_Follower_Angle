@@ -49,7 +49,6 @@ while True:
     top_cutoff = int(height * 0.01)
     bottom_cutoff = int(height * 0.66)
     image = image[top_cutoff:bottom_cutoff, :]
-    theta=0
     minLineLength = 20
     maxLineGap = 40
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
