@@ -50,8 +50,8 @@ while True:
     bottom_cutoff = int(height * 0.66)
     image = image[top_cutoff:bottom_cutoff, :]
     theta=0
-    minLineLength = 10
-    maxLineGap = 20
+    minLineLength = 20
+    maxLineGap = 40
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     blur = cv2.GaussianBlur(gray, (5, 5), 0)
     ret, threshold = cv2.threshold(blur, 100, 255, cv2.THRESH_BINARY)
