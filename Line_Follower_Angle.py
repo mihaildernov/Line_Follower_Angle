@@ -16,43 +16,22 @@ vehicle.armed = True
 
 while not vehicle.armed:
     print("Ждем моторы...")
-    time.sleep(1) 
-
-def set_velocity(vehicle, vx, vy, vz):
-    msg = vehicle.message_factory.set_position_target_local_ned_encode(
-    0, 0, 0, mavutil.mavlink.MAV_FRAME_LOCAL_NED, 0b0000111111000111, 0, 0, 0, vx, vy, vz, 0, 0, 0, 0, 0)
-    vehicle.send_mavlink(msg)
+    time.sleep(1)
 
 def circle(duration):
     vehicle.channels.overrides['1'] = 1200
-    time.sleep(duration)
-    vehicle.channels.overrides['1'] = 1500
 
 def move_right(duration):
-    a = int(1450 + abs(angle) * 2)
     b = int(1700 + abs(angle) * 2)
-    vehicle.channels.overrides['3'] = a
     vehicle.channels.overrides['1'] = b
-    time.sleep(duration)
-    vehicle.channels.overrides['3'] = 1200
-    vehicle.channels.overrides['1'] = 1500
-
 
 def move_forward(duration):
     vehicle.channels.overrides['3'] = 1500
-    time.sleep(duration)
-    vehicle.channels.overrides['3'] = 1200
-
 
 def move_left(duration):
-    a = int(1450 + abs(angle) * 2)
-    c = int(1350 - abs(angle) * 2)
-    vehicle.channels.overrides['3'] = a
+    c = int(1300 - abs(angle) * 2)
     vehicle.channels.overrides['1'] = c
-    time.sleep(duration)
-    vehicle.channels.overrides['3'] = 1200
-    vehicle.channels.overrides['1'] = 1500
-
+    
 cap = cv2.VideoCapture(0)
 
 GPIO.setmode(GPIO.BCM)
@@ -62,10 +41,6 @@ GPIO.setup(12, GPIO.OUT)
 GPIO.setup(16, GPIO.OUT)
 GPIO.setup(20, GPIO.OUT)
 GPIO.setup(21, GPIO.OUT)
-
-set_velocity(vehicle, 0.1, 0.1, 0.1)
-
-vehicle.airspeed = 0.1
 
 while True:
     ret, image = cap.read()
@@ -77,12 +52,10 @@ while True:
     theta=0
     minLineLength = 10
     maxLineGap = 20
-    lower_blue = np.array([169, 100, 100])
-    upper_blue = np.array([189, 255, 255])
-    rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-    hsv = cv2.cvtColor(rgb, cv2.COLOR_BGR2HSV)
-    mask = cv2.inRange(hsv, lower_blue, upper_blue)
-    edges = cv2.Canny(mask, 50, 150)
+    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    blur = cv2.GaussianBlur(gray, (5, 5), 0)
+    ret, threshold = cv2.threshold(blur, 100, 255, cv2.THRESH_BINARY)
+    edges = cv2.Canny(threshold, 50, 150, apertureSize=3)
     cv2.imshow("img", edges)
     if cv2.waitKey(1) >= 0:
         break
