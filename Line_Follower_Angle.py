@@ -18,19 +18,27 @@ while not vehicle.armed:
     print("Ждем моторы...")
     time.sleep(1)
 
+def stop(duration):
+    vehicle.channels.overrides['1'] = 1500
+    vehicle.channels.overrides['3'] = 1200
+
 def circle(duration):
     vehicle.channels.overrides['1'] = 1200
+    vehicle.channels.overrides['3'] = 1200
 
 def move_right(duration):
     b = int(1700 + abs(angle) * 2)
     vehicle.channels.overrides['1'] = b
+    vehicle.channels.overrides['3'] = 1200
 
 def move_forward(duration):
     vehicle.channels.overrides['3'] = 1500
+    vehicle.channels.overrides['1'] = 1500
 
 def move_left(duration):
     c = int(1300 - abs(angle) * 2)
     vehicle.channels.overrides['1'] = c
+    vehicle.channels.overrides['3'] = 1200
     
 cap = cv2.VideoCapture(0)
 
@@ -101,6 +109,7 @@ while True:
                     
     else:
         print("Линия не найдена")
+        stop(0.5)
 
 GPIO.output(12, GPIO.LOW)
 GPIO.output(16, GPIO.LOW)
