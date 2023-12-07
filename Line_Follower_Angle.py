@@ -23,7 +23,7 @@ def stop(duration):
     vehicle.channels.overrides['3'] = 1200
 
 def circle(duration):
-    vehicle.channels.overrides['1'] = 1200
+    vehicle.channels.overrides['1'] = 1300
     vehicle.channels.overrides['3'] = 1200
 
 def move_right(duration):
@@ -109,7 +109,7 @@ while True:
                     
     else:
         print("Линия не найдена")
-        stop(0.5)
+        circle(0.5)
 
 GPIO.output(12, GPIO.LOW)
 GPIO.output(16, GPIO.LOW)
